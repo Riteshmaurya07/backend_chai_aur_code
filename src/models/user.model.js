@@ -42,10 +42,10 @@ const userSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "Video"
     }],
-    // refreshToken: {
-    //     type: String,
-    //     required: true
-    // },
+    refreshToken: {
+        type: String,
+        // required: true
+    },
 
 
 }, { timestamps: true });
@@ -58,8 +58,15 @@ userSchema.pre('save', async function (next) {
 });
 
 userSchema.methods.comparePassword = async function (password) {
-    return await bcrypt.compare(password, this.password);
-}
+    try {
+        console.log("Comparing password:", password, "with stored hash:", this.password);
+        return await bcrypt.compare(password, this.password);
+    } catch (err) {
+        console.error("Error comparing passwords:", err);
+        return false;
+    }
+};
+
 
 userSchema.methods.generateAccessToken = function () {
     return jwt.sign({ 
